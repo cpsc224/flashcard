@@ -9,6 +9,13 @@ public class Card implements Serializable{
 		answer ="";
 		question = "";
 	}
+	
+	/**
+	 * 
+	 * @param question 
+	 * 
+	 *
+	 */
 	public Card(String question, String answer){ 
 		cardScore = new Score();
 		this.question = question; 
