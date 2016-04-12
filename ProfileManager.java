@@ -38,7 +38,7 @@ public class ProfileManager implements Serializable {
 	/** 
 	 *Adds a user to the list 
 	 *@post The user has been added to the list 
-	 *@param username is the username of the new user to be added 
+	 *@param user is the User to be added
 	 */ 
 	public void addUser(User user) { 
 		users.add(user); 
@@ -74,5 +74,12 @@ public class ProfileManager implements Serializable {
 		return false; 
 	} 
 
-
+	/**
+	*Retrieves the number of users that the manager contains
+	*@return Returns the size of the ArrayList users
+	*/
+	public int getNumberOfUsers() {
+		return users.size();
+	}
+	
 }
