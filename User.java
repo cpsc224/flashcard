@@ -19,10 +19,18 @@ public class User implements Serializable{
 		missCutoff = .5;
 	} 
 	
+	/**
+	* Sets the cutoff for frequently missed
+	* @param missCutoff is the new cutoff for frequently missed
+	*/
 	public void setMissCutoff(double missCutoff){
 		this.missCutoff = missCutoff;
 	}
 	
+	/**
+	* Retrieves the cutoff for frequently missed
+	* @return Returns the double missCutoff
+	*/
 	public double getMissCutoff(){
 		return missCutoff;
 	}
@@ -138,4 +146,12 @@ public class User implements Serializable{
 
 		return nDeck; 
 	} 
+	
+	/**
+	*Retrieves the number of decks that the user has
+	*@return Returns the size of the ArrayList decks
+	*/
+	public int getNumberOfDecks() {
+		return decks.size();
+	}
 }
