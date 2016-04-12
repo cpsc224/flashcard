@@ -57,8 +57,7 @@ public class User implements Serializable{
 	/** 
 	 *Adds a deck to the list 
 	 *@post A new deck has been added to the list 
-	 *@param name is the name of the new deck to be added 
-	 *@param category is the category of the new deck to be added 
+	 *@param deck is the Deck to be added
 	 */ 
 	public void addDeck(Deck deck) {  
 		decks.add(deck); 
