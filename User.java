@@ -93,7 +93,7 @@ public class User implements Serializable{
 	 *@return Returns a deck that contains all cards from all decks that correspond to the given category 
 	 */ 
 	public Deck createCategoryDeck(String category) { 
-		Deck categoryDeck = new Deck(); 
+		Deck categoryDeck = new Deck(category); 
 
 		for(int i = 0; i < decks.size(); i++) { 
 			Deck current = decks.get(i); 
