@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -23,6 +24,7 @@ public class GUI extends JFrame {
 	private User user;
 	private Deck deck;
 	private Card card;
+	private Deck originalDeck;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -61,6 +63,8 @@ public class GUI extends JFrame {
 			welcomeLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
 			welcomeLabel.setBounds(87, 23, 292, 25);
 			add(welcomeLabel);
+			
+			if(pm.getNumberOfUsers() == 0) existUserButton.setEnabled(false);
 			
 			newUserButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
@@ -172,6 +176,11 @@ public class GUI extends JFrame {
 			selectButton.setBounds(316, 242, 97, 25);
 			add(selectButton);
 			
+			if(pm.getNumberOfUsers() == 0) {
+				selectButton.setEnabled(false);
+				deleteButton.setEnabled(false);
+			}
+			
 			String [] data = new String[pm.getNumberOfUsers()];
 			for(int i = 0; i < pm.getNumberOfUsers(); i++) {
 				data[i] = (pm.getUser(i)).getUsername();
@@ -198,10 +207,11 @@ public class GUI extends JFrame {
 					String selected = userList.getSelectedValue().toString();
 					user = pm.getUser(selected);
 					frame.getContentPane().removeAll();
-					frame.add(new deckListPanel(frame));
+					frame.add(new userMenuPanel(frame));
 					frame.setVisible(true);
 				}
 			});
+
 			
 			deleteButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
@@ -307,7 +317,7 @@ public class GUI extends JFrame {
 			backButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					frame.getContentPane().removeAll();
-					frame.add(new openPanel(frame));
+					frame.add(new userMenuPanel(frame));
 					frame.setVisible(true);
 				}
 			});
@@ -335,6 +345,12 @@ public class GUI extends JFrame {
 			selectButton.setBounds(316, 242, 97, 25);
 			add(selectButton);
 			
+			if(user.getNumberOfDecks() == 0) {
+				selectButton.setEnabled(false);
+				deleteButton.setEnabled(false);
+			}
+			
+			
 			String [] data = new String[user.getNumberOfDecks()];
 			for(int i = 0; i < user.getNumberOfDecks(); i++) {
 				data[i] = (user.getDeck(i)).getName();
@@ -351,7 +367,7 @@ public class GUI extends JFrame {
 			backButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					frame.getContentPane().removeAll();
-					frame.add(new openPanel(frame));
+					frame.add(new userMenuPanel(frame));
 					frame.setVisible(true);
 				}
 			});
@@ -368,6 +384,16 @@ public class GUI extends JFrame {
 				    	frame.add(new deckListPanel(frame));
 				    	frame.setVisible(true);
 				    } 
+				}
+			});
+			
+			selectButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					String selected = deckList.getSelectedValue().toString();
+					deck = user.getDeck(selected);
+					frame.getContentPane().removeAll();
+					frame.add(new deckMenuPanel(frame));
+					frame.setVisible(true);
 				}
 			});
 		}
@@ -432,12 +458,25 @@ public class GUI extends JFrame {
 			add(cardLabel);
 			
 			JButton backButton = new JButton("Back");
-			backButton.setBounds(25, 242, 97, 25);
+			backButton.setBounds(20, 242, 112, 25);
 			add(backButton);
 			
-			JButton editButton = new JButton("Edit Card");
-			editButton.setBounds(316, 242, 97, 25);
+			JButton editButton = new JButton("Edit Selected");
+			editButton.setBounds(301, 242, 112, 25);
 			add(editButton);
+			
+			JButton addButton = new JButton("Add");
+			addButton.setBounds(25, 13, 97, 25);
+			add(addButton);
+			
+			JButton deleteButton = new JButton("Delete");
+			deleteButton.setBounds(316, 13, 97, 25);
+			add(deleteButton);
+			
+			if(deck.getSize() == 0) {
+				editButton.setEnabled(false);
+				deleteButton.setEnabled(false);
+			}
 			
 			String [] data = new String [deck.getSize()];
 			for(int i = 0; i < deck.getSize(); i++){
@@ -448,8 +487,9 @@ public class GUI extends JFrame {
 			JScrollPane scrollPane = new JScrollPane(cardList,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			cardList.setFont(new Font("Tahoma", Font.PLAIN, 14));
-			scrollPane.setBounds(96, 55, 243, 154);
+			scrollPane.setBounds(46, 55, 346, 154);
 			add(scrollPane);
+			cardList.setSelectedIndex(0);
 			
 			editButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
@@ -457,6 +497,37 @@ public class GUI extends JFrame {
 					card = deck.getCard(selected);
 					frame.getContentPane().removeAll();
 					frame.add(new editOneCardPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+			
+			addButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new addCardPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+			
+			deleteButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					String message = "Are you sure that you want to delete this card?";
+				    String title = "Delete Card";
+				    int reply = JOptionPane.showConfirmDialog(frame, message, title, JOptionPane.YES_NO_OPTION);
+				    if (reply == JOptionPane.YES_OPTION) {
+				    	int selected = cardList.getSelectedIndex();
+				    	deck.removeCard(selected);
+				    	frame.getContentPane().removeAll();
+				    	frame.add(new editCardPanel(frame));
+				    	frame.setVisible(true);
+				    } 
+				}
+			});
+			
+			backButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new editPanel(frame));
 					frame.setVisible(true);
 				}
 			});
@@ -469,7 +540,7 @@ public class GUI extends JFrame {
 		private JLabel answerLabel;
 		private JButton submitButton, quitButton, checkAnswerButton, correctButton, incorrectButton;
 
-		public QuizPanel() {
+		public QuizPanel(GUI frame) {
 			setLayout(null);
 			
 			JLabel quizModeLabel = new JLabel("Quiz Mode");
@@ -563,7 +634,7 @@ public class GUI extends JFrame {
 	}
 	
 	public class PracticePanel extends JPanel {
-		public PracticePanel() {
+		public PracticePanel(GUI frame) {
 			setLayout(null);
 			
 			JLabel practiceModeLabel = new JLabel("Practice Mode");
@@ -594,4 +665,534 @@ public class GUI extends JFrame {
 
 		}
 	}
+	
+	
+	public class editPanel extends JPanel{
+		public editPanel(GUI frame){ 
+				setLayout(null);
+				JButton editCardButton = new JButton("Edit Cards");
+				editCardButton.setBounds(138, 38, 147, 30);
+				add(editCardButton);
+				
+				JButton renameDeckButton = new JButton("Rename Deck");
+				renameDeckButton.setBounds(138, 78, 147, 30);
+				add(renameDeckButton);
+				
+				JButton catButton = new JButton("Change Category");
+				catButton.setBounds(138, 118, 147, 30);
+				add(catButton);
+				
+				JButton quizSettingButton = new JButton("Quiz Settings");
+				quizSettingButton.setBounds(138, 158, 147, 30);
+				add(quizSettingButton);
+				
+				JButton backButton = new JButton("Back");
+				backButton.setBounds(138, 198, 147, 30);
+				add(backButton);
+
+				JLabel userNameLabel = new JLabel("Edit");
+				userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+				userNameLabel.setBounds(93, 11, 237, 25);
+				add(userNameLabel);
+				
+				editCardButton.addActionListener( new ActionListener() {
+					public void actionPerformed(ActionEvent e){
+						frame.getContentPane().removeAll();
+						frame.add(new editCardPanel(frame));
+						frame.setVisible(true);
+					}
+				});
+				
+				renameDeckButton.addActionListener( new ActionListener() {
+					public void actionPerformed(ActionEvent e){
+						frame.getContentPane().removeAll();
+						frame.add(new renameDeckPanel(frame));
+						frame.setVisible(true);
+					}
+				});
+				
+				catButton.addActionListener( new ActionListener() {
+					public void actionPerformed(ActionEvent e){
+						frame.getContentPane().removeAll();
+						frame.add(new changeCategoryPanel(frame));
+						frame.setVisible(true);
+					}
+				});
+				
+				quizSettingButton.addActionListener( new ActionListener() {
+					public void actionPerformed(ActionEvent e){
+						frame.getContentPane().removeAll();
+						frame.add(new settingPanel(frame));
+						frame.setVisible(true);
+					}
+				});
+
+				backButton.addActionListener( new ActionListener() {
+					public void actionPerformed(ActionEvent e){
+						frame.getContentPane().removeAll();
+						frame.add(new deckMenuPanel(frame));
+						frame.setVisible(true);
+					}
+				});		
+		}
+	}
+	public class deckMenuPanel extends JPanel{
+		public deckMenuPanel(GUI frame){ 
+		setLayout(null);
+		JButton quizButton = new JButton("Quiz");
+		quizButton.setBounds(138, 38, 147, 30);
+		add(quizButton);
+		
+		JButton practiceButton = new JButton("Practice");
+		practiceButton.setBounds(138, 78, 147, 30);
+		add(practiceButton);
+		
+		JButton editButton = new JButton("Edit");
+		editButton.setBounds(138, 118, 147, 30);
+		add(editButton);
+		
+		JButton freqMissedButton = new JButton("Frequently Missed");
+		freqMissedButton.setBounds(138, 158, 147, 30);
+		add(freqMissedButton);
+		
+		JButton resultsButton = new JButton("Results");
+		resultsButton.setBounds(138, 198, 147, 30);
+		add(resultsButton);
+		
+		JButton backButton = new JButton("Back");
+		backButton.setBounds(138, 238, 147, 30);
+		add(backButton);
+		
+		JLabel userNameLabel = new JLabel(deck.getName());
+		userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		userNameLabel.setBounds(93, 11, 237, 25);
+		add(userNameLabel);
+	
+		quizButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new QuizPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		practiceButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new PracticePanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		editButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new editPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		freqMissedButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				originalDeck = deck;
+				deck = user.createFreqMissed(deck);
+				frame.getContentPane().removeAll();
+				frame.add(new frequentlyMissedPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		resultsButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new resultsPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+
+		backButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new deckListPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		}
+	}
+		
+ 	public class userMenuPanel extends JPanel{
+		public userMenuPanel(GUI frame){ 
+		setLayout(null);
+		
+		JButton createNewDeckButton = new JButton("Create New Deck");
+		createNewDeckButton.setBounds(138, 49, 147, 35);
+		add(createNewDeckButton);
+		
+		JButton viewDeckButton = new JButton("View Decks");
+		viewDeckButton.setBounds(138, 95, 147, 35);
+		add(viewDeckButton);
+		
+		JButton resultsButton = new JButton("Results");
+		resultsButton.setBounds(138, 141, 147, 35);
+		add(resultsButton);
+		
+		JButton viewCategoriesButton = new JButton("View Categories");
+		viewCategoriesButton.setBounds(138, 187, 147, 35);
+		add(viewCategoriesButton);
+		
+		JButton signOutButton = new JButton("Sign Out");
+		signOutButton.setBounds(138, 233, 147, 35);
+		add(signOutButton);
+		
+		if(user.getNumberOfDecks() == 0){
+			viewDeckButton.setEnabled(false);
+			viewCategoriesButton.setEnabled(false);
+		}
+		
+		JLabel userNameLabel = new JLabel(user.getUsername());
+		userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		userNameLabel.setBounds(93, 22, 237, 25);
+		add(userNameLabel);
+		
+		createNewDeckButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new newDeckPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		viewDeckButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new deckListPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		resultsButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new resultPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		viewCategoriesButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new categoryPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		signOutButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new openPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		}
+	}
+ 	
+ 	public class addCardPanel extends JPanel{
+ 		public addCardPanel(GUI frame){
+ 			setLayout(null);
+ 			
+ 			JLabel cardLabel = new JLabel("Add Card");
+ 			cardLabel.setHorizontalAlignment(SwingConstants.LEFT);
+ 			cardLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 			cardLabel.setBounds(175, 28, 95, 29);
+ 			add(cardLabel);
+ 			
+ 			JButton backButton = new JButton("Back");
+ 			backButton.setBounds(25, 242, 107, 25);
+ 			add(backButton);
+ 			
+ 			JButton addButton = new JButton("Add Card");
+ 			addButton.setBounds(306, 242, 107, 25);
+ 			add(addButton);
+ 			
+ 			JLabel questionLabel = new JLabel("Question:");
+ 			questionLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			questionLabel.setBounds(25, 63, 68, 17);
+ 			add(questionLabel);
+ 			
+ 			JTextArea questionTextArea = new JTextArea();
+ 			questionTextArea.setRows(2);
+ 			questionTextArea.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			questionTextArea.setBounds(25, 85, 388, 55);
+ 			questionTextArea.setLineWrap(true);
+ 			add(questionTextArea);
+ 			
+ 			JTextArea answerTextArea = new JTextArea();
+ 			answerTextArea.setRows(2);
+ 			answerTextArea.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			answerTextArea.setBounds(25, 174, 388, 55);
+ 			answerTextArea.setLineWrap(true);
+ 			add(answerTextArea);
+ 			
+ 			JLabel answerLabel = new JLabel("Answer:");
+ 			answerLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			answerLabel.setBounds(25, 153, 68, 17);
+ 			add(answerLabel);
+ 			
+ 			addButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					String q = questionTextArea.getText();
+ 					String a = answerTextArea.getText();
+ 					if(q.equals("")) {
+						Object[] options = {"OK"};
+					    int n = JOptionPane.showOptionDialog(frame,
+					                   "Please enter a question.","Error",
+					                   JOptionPane.PLAIN_MESSAGE,
+					                   JOptionPane.QUESTION_MESSAGE,
+					                   null,
+					                   options,
+					                   options[0]);
+					}
+ 					else if(a.equals("")){
+ 						Object[] options = {"OK"};
+					    int n = JOptionPane.showOptionDialog(frame,
+					                   "Please enter an answer.","Error",
+					                   JOptionPane.PLAIN_MESSAGE,
+					                   JOptionPane.QUESTION_MESSAGE,
+					                   null,
+					                   options,
+					                   options[0]);
+ 					}
+					else {
+						deck.addCard(q, a);
+	 					frame.getContentPane().removeAll();
+	 					frame.add(new editCardPanel(frame));
+	 					frame.setVisible(true);
+					}
+ 				}
+ 			});
+ 			
+ 			backButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					frame.getContentPane().removeAll();
+ 					frame.add(new editCardPanel(frame));
+ 					frame.setVisible(true);
+ 				}
+ 			});
+ 		}
+ 	}
+ 	
+ 	public class editOneCardPanel extends JPanel{
+ 		public editOneCardPanel(GUI frame){
+ 			setLayout(null);
+ 			
+ 			JLabel cardLabel = new JLabel("Edit Card");
+ 			cardLabel.setHorizontalAlignment(SwingConstants.LEFT);
+ 			cardLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 			cardLabel.setBounds(175, 28, 95, 29);
+ 			add(cardLabel);
+ 			
+ 			JButton backButton = new JButton("Back");
+ 			backButton.setBounds(25, 242, 107, 25);
+ 			add(backButton);
+ 			
+ 			JButton saveButton = new JButton("Save");
+ 			saveButton.setBounds(306, 242, 107, 25);
+ 			add(saveButton);
+ 			
+ 			JLabel questionLabel = new JLabel("Question:");
+ 			questionLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			questionLabel.setBounds(25, 63, 68, 17);
+ 			add(questionLabel);
+ 			
+ 			JTextArea questionTextArea = new JTextArea();
+ 			questionTextArea.setRows(2);
+ 			questionTextArea.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			questionTextArea.setBounds(25, 85, 388, 55);
+ 			questionTextArea.setLineWrap(true);
+ 			questionTextArea.setText(card.getQuestion());
+ 			add(questionTextArea);
+ 			
+ 			JTextArea answerTextArea = new JTextArea();
+ 			answerTextArea.setRows(2);
+ 			answerTextArea.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			answerTextArea.setBounds(25, 174, 388, 55);
+ 			answerTextArea.setLineWrap(true);
+ 			answerTextArea.setText(card.getAnswer());
+ 			add(answerTextArea);
+ 			
+ 			JLabel answerLabel = new JLabel("Answer:");
+ 			answerLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			answerLabel.setBounds(25, 153, 68, 17);
+ 			add(answerLabel);
+ 			
+ 			saveButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					String q = questionTextArea.getText();
+ 					String a = answerTextArea.getText();
+ 					if(q.equals("")) {
+						Object[] options = {"OK"};
+					    int n = JOptionPane.showOptionDialog(frame,
+					                   "Please enter a question.","Error",
+					                   JOptionPane.PLAIN_MESSAGE,
+					                   JOptionPane.QUESTION_MESSAGE,
+					                   null,
+					                   options,
+					                   options[0]);
+					}
+ 					else if(a.equals("")){
+ 						Object[] options = {"OK"};
+					    int n = JOptionPane.showOptionDialog(frame,
+					                   "Please enter an answer.","Error",
+					                   JOptionPane.PLAIN_MESSAGE,
+					                   JOptionPane.QUESTION_MESSAGE,
+					                   null,
+					                   options,
+					                   options[0]);
+ 					}
+					else {
+						card.setQuestion(q);
+						card.setAnswer(a);
+	 					frame.getContentPane().removeAll();
+	 					frame.add(new editCardPanel(frame));
+	 					frame.setVisible(true);
+					}
+ 				}
+ 			});
+ 			
+ 			backButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					frame.getContentPane().removeAll();
+ 					frame.add(new editCardPanel(frame));
+ 					frame.setVisible(true);
+ 				}
+ 			});
+ 		}
+ 	}
+ 	
+ 	public class frequentlyMissedPanel extends JPanel{
+ 		public frequentlyMissedPanel(GUI frame){
+ 			setLayout(null);
+ 			
+ 			JLabel cardLabel = new JLabel("Frequenty Missed");
+ 			cardLabel.setHorizontalAlignment(SwingConstants.LEFT);
+ 			cardLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 			cardLabel.setBounds(137, 11, 158, 29);
+ 			add(cardLabel);
+ 			
+ 			JButton quizButton = new JButton("Quiz");
+ 			quizButton.setBounds(138, 38, 147, 30);
+ 			add(quizButton);
+ 			
+ 			JButton practiceButton = new JButton("Practice");
+ 			practiceButton.setBounds(138, 78, 147, 30);
+ 			add(practiceButton);
+ 			
+ 			JButton backButton = new JButton("Back");
+ 			backButton.setBounds(138, 118, 147, 30);
+ 			add(backButton);
+ 			
+ 			quizButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					frame.getContentPane().removeAll();
+ 					frame.add(new QuizPanel(frame));
+ 					frame.setVisible(true);
+ 				}
+ 			});
+ 			
+ 			practiceButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					frame.getContentPane().removeAll();
+ 					frame.add(new PracticePanel(frame));
+ 					frame.setVisible(true);
+ 				}
+ 			});
+ 			
+ 			backButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					deck = originalDeck;
+ 					frame.getContentPane().removeAll();
+ 					frame.add(new deckMenuPanel(frame));
+ 					frame.setVisible(true);
+ 				}
+ 			});
+ 		}
+ 	}
+ 	
+ 	public class categoryMenuPanel extends JPanel{
+		public categoryMenuPanel(GUI frame){ 
+			setLayout(null);
+			JButton quizButton = new JButton("Quiz");
+			quizButton.setBounds(138, 38, 147, 30);
+			add(quizButton);
+			
+			JButton practiceButton = new JButton("Practice");
+			practiceButton.setBounds(138, 78, 147, 30);
+			add(practiceButton);
+			
+			JButton freqMissedButton = new JButton("Frequently Missed");
+			freqMissedButton.setBounds(138, 118, 147, 30);
+			add(freqMissedButton);
+			
+			JButton settingButton = new JButton("Quiz Settings");
+			settingButton.setBounds(138, 158, 147, 30);
+			add(settingButton);
+			
+			JButton backButton = new JButton("Back");
+			backButton.setBounds(138, 198, 147, 30);
+			add(backButton);
+			
+			
+			JLabel catLabel = new JLabel(deck.getName());
+			catLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			catLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+			catLabel.setBounds(93, 11, 237, 25);
+			add(catLabel);
+			
+			quizButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new QuizPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+			
+			practiceButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new PracticePanel(frame));
+					frame.setVisible(true);
+				}
+			});
+			
+			freqMissedButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					originalDeck = deck;
+					deck = user.createFreqMissed(deck);
+					frame.getContentPane().removeAll();
+					frame.add(new frequentlyMissedPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+			
+			settingButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new settingPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+			
+			backButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new categoryPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+		}
+ 	}
+
 }
