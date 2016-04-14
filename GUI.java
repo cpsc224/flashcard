@@ -539,6 +539,9 @@ public class GUI extends JFrame {
 		private JTextField answerTextField;
 		private JLabel answerLabel;
 		private JButton submitButton, quitButton, checkAnswerButton, correctButton, incorrectButton;
+		private JTextPane cardTextPanel;
+		private int index;
+		private int correct;
 
 		public QuizPanel(GUI frame) {
 			setLayout(null);
@@ -549,7 +552,7 @@ public class GUI extends JFrame {
 			quizModeLabel.setBounds(177, 28, 93, 16);
 			add(quizModeLabel);
 			
-			JTextPane cardTextPanel = new JTextPane();
+			cardTextPanel = new JTextPane();
 			cardTextPanel.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			cardTextPanel.setEditable(false);
 			cardTextPanel.setBounds(66, 56, 324, 166);
@@ -566,22 +569,11 @@ public class GUI extends JFrame {
 			answerTextField.setColumns(10);
 			
 			submitButton = new JButton("Submit");
-			
-			
-			submitButton.addMouseListener(new MouseAdapter() {
-				/**
-				 * When the submit button is clicked, submits the answer and compares it to the card answer.
-				 */
-				public void mouseClicked(MouseEvent e) {
-					String answer = answerTextField.getText();
-					//if(answer.equals(anObject) )
-				}
-			});
 			submitButton.setBounds(363, 230, 81, 29);
 			add(submitButton);
 			
 			quitButton = new JButton("Quit");
-			quitButton.setBounds(6, 262, 75, 29);
+			quitButton.setBounds(6, 18, 75, 29);
 			add(quitButton);
 			
 			checkAnswerButton = new JButton("Check Answer");
@@ -596,6 +588,54 @@ public class GUI extends JFrame {
 			incorrectButton.setBounds(245, 230, 117, 29);
 			add(incorrectButton);
 			
+			index = 0;
+			
+			if(deck.getIsManual()) displayManualMode();
+			else displayTextFieldMode();
+			
+			checkAnswerButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					displayCheckAnswerMode();
+				}
+			});
+			
+			submitButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					
+				}
+			});
+			
+			correctButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					Score score = deck.getCard(index).getScoreObject();
+					score.addCorrectAttempt();
+					correct++;
+					index++;
+					if(index < deck.getSize()) displayManualMode();
+				}
+			});
+			
+			incorrectButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					Score score = deck.getCard(index).getScoreObject();
+					score.addWrongAttempt();
+					index++;
+					if(index < deck.getSize()) displayManualMode();
+				}
+			});
+			
+			quitButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					String message = "Are you sure that you want to quit?";
+				    String title = "Quit";
+				    int reply = JOptionPane.showConfirmDialog(frame, message, title, JOptionPane.YES_NO_OPTION);
+				    if (reply == JOptionPane.YES_OPTION) {
+				    	frame.getContentPane().removeAll();
+				    	frame.add(new deckMenuPanel(frame));
+				    	frame.setVisible(true);
+				    } 
+				}
+			});
 		}
 		
 		/**
@@ -607,8 +647,9 @@ public class GUI extends JFrame {
 			submitButton.setVisible(false);
 			correctButton.setVisible(false);
 			incorrectButton.setVisible(false);
-			
 			checkAnswerButton.setVisible(true);
+			
+			cardTextPanel.setText(deck.getCard(index).getQuestion());
 		}
 		
 		/**
@@ -618,6 +659,7 @@ public class GUI extends JFrame {
 			checkAnswerButton.setVisible(false);
 			correctButton.setVisible(true);
 			incorrectButton.setVisible(true);	
+			cardTextPanel.setText(deck.getCard(index).getAnswer());
 		}
 		
 		/**
@@ -772,17 +814,41 @@ public class GUI extends JFrame {
 	
 		quizButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e){
-				frame.getContentPane().removeAll();
-				frame.add(new QuizPanel(frame));
-				frame.setVisible(true);
-			}
+				if(deck.getSize() == 0) {
+					 Object[] options = {"OK"};
+					    int n = JOptionPane.showOptionDialog(frame,
+					                   "Oops, there are no cards in this deck. Go to Edit Cards to add cards.","No Cards",
+					                   JOptionPane.PLAIN_MESSAGE,
+					                   JOptionPane.QUESTION_MESSAGE,
+					                   null,
+					                   options,
+					                   options[0]);
+				}
+				else{
+					frame.getContentPane().removeAll();
+					frame.add(new QuizPanel(frame));
+					frame.setVisible(true);
+				}
+			}	
 		});
 		
 		practiceButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e){
-				frame.getContentPane().removeAll();
-				frame.add(new PracticePanel(frame));
-				frame.setVisible(true);
+				if(deck.getSize() == 0) {
+					 Object[] options = {"OK"};
+					    int n = JOptionPane.showOptionDialog(frame,
+					                   "Oops, there are no cards in this deck. Go to Edit Cards to add cards.","No Cards",
+					                   JOptionPane.PLAIN_MESSAGE,
+					                   JOptionPane.QUESTION_MESSAGE,
+					                   null,
+					                   options,
+					                   options[0]);
+				}
+				else{
+					frame.getContentPane().removeAll();
+					frame.add(new PracticePanel(frame));
+					frame.setVisible(true);
+				}
 			}
 		});
 		
@@ -1194,5 +1260,7 @@ public class GUI extends JFrame {
 			});
 		}
  	}
+ 	
+ 	
 
 }
