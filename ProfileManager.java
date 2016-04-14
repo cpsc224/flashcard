@@ -82,4 +82,14 @@ public class ProfileManager implements Serializable {
 		return users.size();
 	}
 	
+	/**
+	*Retrieves a user at a certain index
+	*@pre There must be a user at the specified index
+	*@param index is the index of the user to be returned
+	*@return Returns the user at the given index
+	*/
+	public User getUser(int index){
+		return users.get(index);
+	}
+	
 }
