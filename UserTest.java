@@ -29,7 +29,7 @@ public class UserTest {
 	}
 
 	@Test
-	public void testGetDeck() {
+	public void testGetDeckString() {
 		User tester = new User("New");
 		Deck testDeck = new Deck("Deck name", "cat");
 		testDeck.addCard("a", "b");
@@ -169,5 +169,28 @@ public class UserTest {
 		tester.addDeck(new Deck());
 		assertEquals("2 decks", 2, tester.getNumberOfDecks());
 	}
-
+	@Test
+	public void testGetDeckInt() {
+		User tester = new User("New");
+		Deck testDeck = new Deck("Deck name", "cat");
+		testDeck.addCard("a", "b");
+		tester.addDeck(testDeck);
+		Deck testDeck2 = tester.getDeck(0);
+		assertTrue((testDeck2.getCategory()).equals("cat"));
+		assertEquals("The deck has 1 card", 1, testDeck.getSize());
+	}
+	
+	@Test
+	public void testGetCategories(){
+		User tester = new User("New");
+		Deck testDeck = new Deck("Deck name", "cat");
+		Deck testDeck2 = new Deck("Deck name2", "cat");
+		Deck testDeck3 = new Deck("Deck name3", "notcat");
+		tester.addDeck(testDeck);
+		tester.addDeck(testDeck2);
+		tester.addDeck(testDeck3);
+		String[] categories = tester.getCategories();
+		assertTrue(categories[0].equals("cat"));
+		assertTrue(categories[1].equals("notcat"));
+	}
 }
