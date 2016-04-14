@@ -153,4 +153,43 @@ public class User implements Serializable{
 	public int getNumberOfDecks() {
 		return decks.size();
 	}
+	
+	/**
+	*Retrieves a deck at a certain index
+	*@pre There must be a deck at the specified index
+	*@param index is the index of the deck to be returned
+	*@return Returns the deck at the given index
+	*/
+	public Deck getDeck(int index){
+		return decks.get(index);
+	}
+	
+	/**
+	*Retrieves all categories for a user
+	*@return Returns a String array that contains the names of all categories
+	*/
+	public String[] getCategories(){
+		ArrayList<String> categories = new ArrayList<>();
+		
+		for(int i = 0; i < decks.size(); i++) { 
+			Deck current = decks.get(i); 
+			String c = current.getCategory(); 
+
+			boolean alreadyAdded = false;
+			for(int j = 0; j < categories.size(); j++){
+				if(categories.get(j).equals(c)) {
+					alreadyAdded = true;
+				}
+			}
+			
+			if(!alreadyAdded) categories.add(c);
+		}//end for
+		
+	    String [] cat = new String[categories.size()];
+	    for(int l = 0; l < categories.size(); l++){
+	    	cat[l] = categories.get(l);
+	    }
+	    
+	    return cat;
+	  }
 }
