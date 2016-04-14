@@ -11,7 +11,7 @@ public class ProfileManagerTest {
 	}
 
 	@Test
-	public void testGetUser() {
+	public void testGetUserString() {
 		ProfileManager tester = new ProfileManager();
 		User testUser = new User("This user");
 		User testUser2 = new User("A");
@@ -79,5 +79,19 @@ public class ProfileManagerTest {
 		tester.addUser(testUser2);
 		assertEquals("Manager has 2 users", 2, tester.getNumberOfUsers());
 	}
-
+	
+	@Test
+	public void testGetUserInt(){
+		ProfileManager tester = new ProfileManager();
+		User testUser = new User("This user");
+		User testUser2 = new User("A");
+		Deck testDeck = new Deck();
+		testUser2.addDeck(testDeck);
+		tester.addUser(testUser);
+		tester.addUser(testUser2);
+		User aUser = tester.getUser(1);
+		assertEquals("If correct user, user has 1 deck", 1, aUser.getNumberOfDecks());
+		aUser = tester.getUser(0);
+		assertEquals("If correct user, user has 0 decks", 0, aUser.getNumberOfDecks());
+	}
 }
