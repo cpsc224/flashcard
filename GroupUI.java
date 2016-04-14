@@ -54,6 +54,7 @@ public class GroupUI extends JFrame {
 	private JButton btnViewDecks;
 	private JButton btnCancel;
 	private JButton btnCreate;
+	private JButton btnNewButton_2;
 
 	/**
 	 * Launch the application.
@@ -91,8 +92,6 @@ public class GroupUI extends JFrame {
 		panel = new JPanel();
 		cards.add(panel, "panel");
 		
-		JLabel lblWelcomeToThe = DefaultComponentFactory.getInstance().createLabel("Welcome to the Study Tool");
-		
 		
 		button = new JButton("New User");
 		button.addMouseListener(new MouseAdapter() {
@@ -124,23 +123,16 @@ public class GroupUI extends JFrame {
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(157)
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(button, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(button_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(139)
-							.addComponent(lblWelcomeToThe)))
+					.addGap(157)
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(button, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(button_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addContainerGap(156, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(40)
-					.addComponent(lblWelcomeToThe)
-					.addGap(18)
+					.addGap(72)
 					.addComponent(button)
 					.addGap(18)
 					.addComponent(button_1)
@@ -272,6 +264,10 @@ public class GroupUI extends JFrame {
 		btnViewDecks = new JButton("View Decks");
 		btnViewDecks.setBounds(141, 70, 137, 23);
 		userMenu.add(btnViewDecks);
+		
+		btnNewButton_2 = new JButton("New button");
+		btnNewButton_2.setBounds(141, 104, 89, 23);
+		userMenu.add(btnNewButton_2);
 	
 	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
