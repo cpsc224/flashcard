@@ -4,7 +4,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -24,6 +26,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 
@@ -824,6 +827,11 @@ public class GUI extends JFrame {
 			nextButton.setBounds(278, 200, 90, 29);
 			add(nextButton);
 			
+			if(deck.getSize() == 1){
+ 				previousButton.setEnabled(false);
+ 				nextButton.setEnabled(false);
+ 			}
+			
 			index = 0;
 			cardTextPanel.setText(deck.getCard(index).getQuestion());
 			numberLabel.setText(index+1 + " of " + deck.getSize());
@@ -923,7 +931,7 @@ public class GUI extends JFrame {
 				quizSettingButton.addActionListener( new ActionListener() {
 					public void actionPerformed(ActionEvent e){
 						frame.getContentPane().removeAll();
-						frame.add(new settingPanel(frame));
+						frame.add(new quizSettingPanel(frame));
 						frame.setVisible(true);
 					}
 				});
@@ -1045,7 +1053,7 @@ public class GUI extends JFrame {
 		resultsButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				frame.getContentPane().removeAll();
-				frame.add(new resultsPanel(frame));
+				frame.add(new resultPanel(frame));
 				frame.setVisible(true);
 			}
 		});
@@ -1114,7 +1122,7 @@ public class GUI extends JFrame {
 		resultsButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				frame.getContentPane().removeAll();
-				frame.add(new resultPanel(frame));
+				frame.add(new userResultPanel(frame));
 				frame.setVisible(true);
 			}
 		});
@@ -1391,17 +1399,41 @@ public class GUI extends JFrame {
 			
 			quizButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
-					frame.getContentPane().removeAll();
-					frame.add(new QuizPanel(frame));
-					frame.setVisible(true);
-				}
+					if(deck.getSize() == 0) {
+						 Object[] options = {"OK"};
+						    int n = JOptionPane.showOptionDialog(frame,
+						                   "Oops, there are no cards that correspond to this category.","No Cards",
+						                   JOptionPane.PLAIN_MESSAGE,
+						                   JOptionPane.QUESTION_MESSAGE,
+						                   null,
+						                   options,
+						                   options[0]);
+					}
+					else{
+						frame.getContentPane().removeAll();
+						frame.add(new QuizPanel(frame));
+						frame.setVisible(true);
+					}
+				}	
 			});
 			
 			practiceButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
-					frame.getContentPane().removeAll();
-					frame.add(new PracticePanel(frame));
-					frame.setVisible(true);
+					if(deck.getSize() == 0) {
+						 Object[] options = {"OK"};
+						    int n = JOptionPane.showOptionDialog(frame,
+						                   "Oops, there are no cards that correspond to this category.","No Cards",
+						                   JOptionPane.PLAIN_MESSAGE,
+						                   JOptionPane.QUESTION_MESSAGE,
+						                   null,
+						                   options,
+						                   options[0]);
+					}
+					else{
+						frame.getContentPane().removeAll();
+						frame.add(new PracticePanel(frame));
+						frame.setVisible(true);
+					}
 				}
 			});
 			
@@ -1432,7 +1464,7 @@ public class GUI extends JFrame {
 			settingButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					frame.getContentPane().removeAll();
-					frame.add(new settingPanel(frame));
+					frame.add(new quizSettingPanel(frame));
 					frame.setVisible(true);
 				}
 			});
@@ -1555,5 +1587,303 @@ public class GUI extends JFrame {
  			});
  		}
  	}
+ 	
+ 	public class renameDeckPanel extends JPanel{
+ 		public renameDeckPanel(GUI frame){ 
+ 				setLayout(null);
+ 				
+ 				JLabel renameDeckButton = new JLabel("Rename Deck");
+ 				renameDeckButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 				renameDeckButton.setBounds(139, 28, 179, 20);
+ 				add(renameDeckButton);
 
+ 				JLabel deckLabel = new JLabel("Please Enter New Deck Name:");
+ 				deckLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 				deckLabel.setBounds(12, 72, 232, 27);
+ 				add(deckLabel);
+ 				
+ 				JTextField nameTextField = new JTextField();
+ 				nameTextField.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 				nameTextField.setBounds(12, 102, 267, 27);
+ 				add(nameTextField);
+ 				nameTextField.setColumns(10);
+
+ 				JButton backButton = new JButton("Back");
+ 				backButton.setBounds(12, 230, 112, 25);
+ 				add(backButton);
+
+ 				JButton createButton = new JButton("Update");
+ 				createButton.setBounds(310, 230, 112, 25);
+ 				add(createButton);
+ 				
+ 				createButton.addActionListener( new ActionListener() {
+ 					public void actionPerformed(ActionEvent e){
+ 						String name = nameTextField.getText();
+ 						
+ 						
+ 						if(user.isDeckNameTaken(name)) {
+ 							 Object[] options = {"OK"};
+ 							    int n = JOptionPane.showOptionDialog(frame,
+ 							                   "Deck name already taken. Please enter a different name.","Deck Name Taken",
+ 							                   JOptionPane.PLAIN_MESSAGE,
+ 							                   JOptionPane.QUESTION_MESSAGE,
+ 							                   null,
+ 							                   options,
+ 							                   options[0]);
+ 						}
+ 						else if(name.equals("")) {
+ 							Object[] options = {"OK"};
+ 						    int n = JOptionPane.showOptionDialog(frame,
+ 						                   "Please enter a name for your deck.","Error",
+ 						                   JOptionPane.PLAIN_MESSAGE,
+ 						                   JOptionPane.QUESTION_MESSAGE,
+ 						                   null,
+ 						                   options,
+ 						                   options[0]);
+ 						}
+ 						else {	
+ 							deck.setName(name);
+ 							frame.getContentPane().removeAll();
+ 							frame.add(new editPanel(frame));
+ 							frame.setVisible(true);
+ 						}
+ 					}
+ 				});//end create button action listener
+
+ 				backButton.addActionListener( new ActionListener() {
+ 					public void actionPerformed(ActionEvent e){
+ 						frame.getContentPane().removeAll();
+ 						frame.add(new editPanel(frame));
+ 						frame.setVisible(true);
+ 					}
+ 				});
+ 		}
+ 	}
+ 	
+ 	public class resultPanel extends JPanel {
+ 		private JTable table;
+ 		public resultPanel(GUI frame) {
+ 			setLayout(null);
+ 			
+ 			JButton backButton = new JButton("Back");
+ 			backButton.setBounds(163, 241, 117, 29);
+ 			add(backButton);
+ 			/*
+ 			JButton button = new JButton("<-");
+ 			button.setBounds(39, 241, 117, 29);
+ 			add(button);
+ 			
+ 			JButton button_1 = new JButton("->");
+ 			button_1.setBounds(297, 241, 117, 29);
+ 			add(button_1);
+ 			*/
+ 			JLabel resultsLabel = new JLabel("Results");
+ 			resultsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 			resultsLabel.setBounds(190, 19, 61, 16);
+ 			add(resultsLabel);
+ 		
+ 			
+ 			String[] columnNames = {"Attempt", "Score"};
+
+ 			DecimalFormat f = new DecimalFormat("##.0");
+ 			
+ 			ArrayList<Score> scoring = deck.getResults();
+ 			Object[][] data = new Object[scoring.size()][2];
+ 			for (int i = 0; i < scoring.size(); i++) {
+ 			    data[i][0] = i+1;
+ 			    data[i][1] = f.format(scoring.get(i).getPercentage()*100)+"%";
+ 			}
+
+ 			table = new JTable(data, columnNames);
+ 			table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			
+ 			JScrollPane scrollPane = new JScrollPane(table);
+ 			scrollPane.setBounds(40, 40, 350, 190);
+ 			add(scrollPane);
+ 			
+ 			backButton.addActionListener( new ActionListener() {
+					public void actionPerformed(ActionEvent e){
+						frame.getContentPane().removeAll();
+						frame.add(new deckMenuPanel(frame));
+						frame.setVisible(true);
+					}
+				});
+ 		}
+ 	}
+ 	
+ 	public class userResultPanel extends JPanel {
+ 		private JTable table;
+ 		private int index;
+ 		public userResultPanel(GUI frame) {
+ 			setLayout(null);
+ 			
+ 			JButton backButton = new JButton("Back");
+ 			backButton.setBounds(163, 241, 117, 29);
+ 			add(backButton);
+ 			
+ 			JButton prevButton = new JButton("Previous");
+ 			prevButton.setBounds(39, 241, 117, 29);
+ 			add(prevButton);
+ 			
+ 			JButton nextButton = new JButton("Next");
+ 			nextButton.setBounds(297, 241, 117, 29);
+ 			add(nextButton);
+ 			
+ 			JLabel resultsLabel = new JLabel("Results");
+ 			resultsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 			resultsLabel.setBounds(190, 19, 61, 16);
+ 			add(resultsLabel);
+ 		
+ 			if(user.getNumberOfDecks() == 1){
+ 				prevButton.setEnabled(false);
+ 				nextButton.setEnabled(false);
+ 			}
+ 			
+ 			String[] columnNames = {"Attempt", "Score"};
+
+ 			DecimalFormat f = new DecimalFormat("##.0");
+ 			
+ 			index = 0;
+ 			deck = user.getDeck(index);
+ 			ArrayList<Score> scoring = deck.getResults();
+ 			
+ 			Object[][] data = new Object[scoring.size()][2];
+ 			for (int i = 0; i < scoring.size(); i++) {
+ 			    data[i][0] = i+1;
+ 			    data[i][1] = f.format(scoring.get(i).getPercentage()*100)+"%";
+ 			}
+
+ 			table = new JTable(data, columnNames);
+ 			table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			
+ 			JScrollPane scrollPane = new JScrollPane(table);
+ 			scrollPane.setBounds(40, 40, 350, 190);
+ 			add(scrollPane);
+ 			
+ 			backButton.addActionListener( new ActionListener() {
+					public void actionPerformed(ActionEvent e){
+						frame.getContentPane().removeAll();
+						frame.add(new userMenuPanel(frame));
+						frame.setVisible(true);
+					}
+			});
+ 			
+ 			nextButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					if(index != user.getNumberOfDecks()-1) index++;
+					else index = 0;
+					
+					deck = user.getDeck(index);
+		 			ArrayList<Score> scoring = deck.getResults();
+		 			
+		 			Object[][] data = new Object[scoring.size()][2];
+		 			for (int i = 0; i < scoring.size(); i++) {
+		 			    data[i][0] = i+1;
+		 			   if(scoring.get(i).getPercentage() == 0)
+		 			    	data[i][1] = "0.0%";
+		 			    else
+		 			    	data[i][1] = f.format(scoring.get(i).getPercentage()*100)+"%";
+		 			}
+		 			
+		 			table = new JTable(data, columnNames);
+		 			table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		 			
+		 			JScrollPane scrollPane = new JScrollPane(table);
+		 			scrollPane.setBounds(40, 40, 350, 190);
+		 			add(scrollPane);
+				}
+ 			});
+ 			
+ 			prevButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					if(index != 0) index--;
+					else index = user.getNumberOfDecks() - 1;
+					
+					deck = user.getDeck(index);
+		 			ArrayList<Score> scoring = deck.getResults();
+		 			
+		 			Object[][] data = new Object[scoring.size()][2];
+		 			for (int i = 0; i < scoring.size(); i++) {
+		 			    data[i][0] = i+1;
+		 			    if(scoring.get(i).getPercentage() == 0)
+		 			    	data[i][1] = "0.0%";
+		 			    else
+		 			    	data[i][1] = f.format(scoring.get(i).getPercentage()*100)+"%";
+		 			}
+		 			
+		 			table = new JTable(data, columnNames);
+		 			table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		 			
+		 			JScrollPane scrollPane = new JScrollPane(table);
+		 			scrollPane.setBounds(40, 40, 350, 190);
+		 			add(scrollPane);
+				}
+ 			});
+ 		}
+ 	}
+ 	
+ 	public class quizSettingPanel extends JPanel{
+ 		public quizSettingPanel(GUI frame){ 
+ 		setLayout(null);
+ 			
+ 			JLabel quizSettingsButton = new JLabel("Quiz Settings");
+ 			quizSettingsButton.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 			quizSettingsButton.setBounds(139, 28, 179, 20);
+ 			add(quizSettingsButton);
+
+ 			JButton backButton = new JButton("Back");
+ 			backButton.setBounds(12, 230, 112, 25);
+ 			add(backButton);
+
+ 			JButton saveButton = new JButton("Save");
+ 			saveButton.setBounds(310, 230, 112, 25);
+ 			add(saveButton);
+ 			
+ 			JRadioButton rdbtnTextField = new JRadioButton("Text Field");
+ 			rdbtnTextField.setBounds(139, 78, 109, 23);
+ 			add(rdbtnTextField);
+ 			
+ 			JRadioButton rdbtnManual = new JRadioButton("Manual");
+ 			rdbtnManual.setBounds(139, 116, 109, 23);
+ 			add(rdbtnManual);
+ 			
+ 			if(deck.getIsManual()){
+ 				rdbtnManual.setSelected(true);
+ 			}
+ 			else
+ 				rdbtnTextField.setSelected(true);
+
+ 			rdbtnTextField.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					rdbtnManual.setSelected(false);	
+ 					rdbtnTextField.setSelected(true);
+ 			}
+ 			});
+ 			
+ 			rdbtnManual.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					rdbtnTextField.setSelected(false);
+ 					rdbtnManual.setSelected(true);
+ 			}	
+ 			});	
+ 			
+ 			saveButton.addActionListener( new ActionListener() {
+ 				public void actionPerformed(ActionEvent e){
+ 					if(rdbtnTextField.isSelected()){
+ 						deck.setManualOff();
+ 					}
+ 					else
+ 						deck.setManualOn();
+ 			}	
+ 			});	
+ 				
+ 				backButton.addActionListener( new ActionListener() {
+ 					public void actionPerformed(ActionEvent e){
+ 						frame.getContentPane().removeAll();
+ 						frame.add(new editPanel(frame));
+ 						frame.setVisible(true);
+ 					}
+ 				});
+ 		}
+ 		}
 }
