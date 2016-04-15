@@ -1,10 +1,11 @@
 import static org.junit.Assert.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.junit.Test;
 
-public class UserTest {
+public class UserTest implements Serializable{
 
 	@Test
 	public void testUser() {
@@ -140,11 +141,36 @@ public class UserTest {
 				score3 = new Score(5, 0), //0
 				score4 = new Score(5, 2); //0.4
 		
-		card0.setCardScore(score0);
-		card1.setCardScore(score1);
-		card2.setCardScore(score2);
-		card3.setCardScore(score3);
-		card4.setCardScore(score4);
+		card0.getScoreObject().addWrongAttempt();
+		card0.getScoreObject().addWrongAttempt();
+		card0.getScoreObject().addWrongAttempt();
+		card0.getScoreObject().addWrongAttempt();
+		card0.getScoreObject().addCorrectAttempt();
+		
+		card1.getScoreObject().addWrongAttempt();
+		card1.getScoreObject().addWrongAttempt();
+		card1.getScoreObject().addCorrectAttempt();
+		card1.getScoreObject().addCorrectAttempt();
+		card1.getScoreObject().addCorrectAttempt();
+		
+		card2.getScoreObject().addWrongAttempt();
+		card2.getScoreObject().addCorrectAttempt();
+		card2.getScoreObject().addCorrectAttempt();
+		card2.getScoreObject().addCorrectAttempt();
+		card2.getScoreObject().addCorrectAttempt();
+		
+		card3.getScoreObject().addWrongAttempt();
+		card3.getScoreObject().addWrongAttempt();
+		card3.getScoreObject().addWrongAttempt();
+		card3.getScoreObject().addWrongAttempt();
+		card3.getScoreObject().addWrongAttempt();
+
+		card4.getScoreObject().addWrongAttempt();
+		card4.getScoreObject().addWrongAttempt();
+		card4.getScoreObject().addWrongAttempt();
+		card4.getScoreObject().addCorrectAttempt();
+		card4.getScoreObject().addCorrectAttempt();
+		
 		
 		Deck fmDeck = tester.createFreqMissed(testDeck);
 		assertEquals("F.M. Deck has 3 cards", 3, fmDeck.getSize());
@@ -169,6 +195,7 @@ public class UserTest {
 		tester.addDeck(new Deck());
 		assertEquals("2 decks", 2, tester.getNumberOfDecks());
 	}
+	
 	@Test
 	public void testGetDeckInt() {
 		User tester = new User("New");
@@ -193,4 +220,6 @@ public class UserTest {
 		assertTrue(categories[0].equals("cat"));
 		assertTrue(categories[1].equals("notcat"));
 	}
+	
+
 }
