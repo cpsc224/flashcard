@@ -30,13 +30,33 @@ public class GUI extends JFrame {
 	private Deck originalDeck;
 	private Score score;
 	
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				pm = new ProfileManager();
-				
+				FileReadWrite rw = new FileReadWrite();
+				try {
+					pm = rw.readFile("testfile");
+				} catch (ClassNotFoundException | IOException e2) {
+					// TODO Auto-generated catch block
+					//e2.printStackTrace();
+					pm = new ProfileManager();
+				}
 				GUI frame = new GUI(pm);
 				frame.setVisible(true);
+				frame.addWindowListener(new WindowAdapter()
+				{
+				    public void windowClosing(WindowEvent e)
+				    {
+				       try {
+						rw.saveFile("testfile", pm);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				        
+				    }
+				});
 			}
 		});
 		
