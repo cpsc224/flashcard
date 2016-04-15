@@ -23,6 +23,7 @@ public class Deck implements Serializable{
 		name = ""; 
 		resultList = new ArrayList<Score>(); 
 		isManual = false; 
+		category = "";
 	} 
 
 	public Deck(String name){ 
@@ -30,6 +31,7 @@ public class Deck implements Serializable{
 		cardList = new ArrayList<Card>(); 
 		resultList = new ArrayList<Score>(); 
 		isManual = false; 
+		category = "";
 	} 
 
 	public Deck(String name, String category){ 
@@ -147,7 +149,7 @@ public class Deck implements Serializable{
 	*@param correct is the number of correct answers that the user had
 	*/
 	public void addResult(int correct) {
-		Score result = new Score(cardList.size(),correct );
+		Score result = new Score(cardList.size(), correct);
 		resultList.add(result);
 	}
 	
