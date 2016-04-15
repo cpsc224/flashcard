@@ -15,6 +15,9 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 
@@ -25,6 +28,7 @@ public class GUI extends JFrame {
 	private Deck deck;
 	private Card card;
 	private Deck originalDeck;
+	private Score score;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -45,6 +49,7 @@ public class GUI extends JFrame {
 
 		add(new openPanel(this));
 		setVisible(true);
+
 	}
 	
 	public class openPanel extends JPanel{
@@ -461,16 +466,16 @@ public class GUI extends JFrame {
 			backButton.setBounds(20, 242, 112, 25);
 			add(backButton);
 			
-			JButton editButton = new JButton("Edit Selected");
-			editButton.setBounds(301, 242, 112, 25);
-			add(editButton);
-			
-			JButton addButton = new JButton("Add");
-			addButton.setBounds(25, 13, 97, 25);
+			JButton addButton = new JButton("Add Card");
+			addButton.setBounds(301, 242, 112, 25);
 			add(addButton);
 			
+			JButton editButton = new JButton("Edit Selected");
+			editButton.setBounds(25, 13, 110, 25);
+			add(editButton);
+			
 			JButton deleteButton = new JButton("Delete");
-			deleteButton.setBounds(316, 13, 97, 25);
+			deleteButton.setBounds(316, 13, 110, 25);
 			add(deleteButton);
 			
 			if(deck.getSize() == 0) {
@@ -538,7 +543,7 @@ public class GUI extends JFrame {
 	public class QuizPanel extends JPanel {
 		private JTextField answerTextField;
 		private JLabel answerLabel;
-		private JButton submitButton, quitButton, checkAnswerButton, correctButton, incorrectButton;
+		private JButton submitButton, quitButton, checkAnswerButton, correctButton, incorrectButton, nextButton;
 		private JTextPane cardTextPanel;
 		private int index;
 		private int correct;
@@ -560,16 +565,16 @@ public class GUI extends JFrame {
 			
 			answerLabel = new JLabel("Answer:");
 			answerLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
-			answerLabel.setBounds(49, 234, 54, 16);
+			answerLabel.setBounds(29, 234, 60, 22);
 			add(answerLabel);
 			
 			answerTextField = new JTextField();
-			answerTextField.setBounds(104, 230, 258, 26);
+			answerTextField.setBounds(64, 230, 258, 26);
 			add(answerTextField);
 			answerTextField.setColumns(10);
 			
 			submitButton = new JButton("Submit");
-			submitButton.setBounds(363, 230, 81, 29);
+			submitButton.setBounds(323, 230, 81, 29);
 			add(submitButton);
 			
 			quitButton = new JButton("Quit");
@@ -580,6 +585,10 @@ public class GUI extends JFrame {
 			checkAnswerButton.setBounds(171, 230, 117, 29);
 			add(checkAnswerButton);
 			
+			nextButton = new JButton("Next Card");
+			nextButton.setBounds(171, 230, 117, 29);
+			add(nextButton);
+			
 			correctButton = new JButton("Correct");
 			correctButton.setBounds(114, 230, 117, 29);
 			add(correctButton);
@@ -589,6 +598,7 @@ public class GUI extends JFrame {
 			add(incorrectButton);
 			
 			index = 0;
+			correct = 0;
 			
 			if(deck.getIsManual()) displayManualMode();
 			else displayTextFieldMode();
@@ -601,17 +611,50 @@ public class GUI extends JFrame {
 			
 			submitButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
-					
+					if(answerTextField.getText().toLowerCase().equals(deck.getCard(index).getAnswer().toLowerCase())){
+						score = deck.getCard(index).getScoreObject();
+						score.addCorrectAttempt();
+						correct++;
+						answerLabel.setText("Correct");
+						displayCheckAnswerSumbitMode();
+					}
+					else{
+						score = deck.getCard(index).getScoreObject();
+						score.addWrongAttempt();
+						answerLabel.setText("Incorrect");
+						displayCheckAnswerSumbitMode();
+					}
 				}
 			});
 			
 			correctButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
-					Score score = deck.getCard(index).getScoreObject();
+					score = deck.getCard(index).getScoreObject();
 					score.addCorrectAttempt();
 					correct++;
 					index++;
 					if(index < deck.getSize()) displayManualMode();
+					else{
+						deck.addResult(correct);
+						score = new Score(deck.getSize(), correct);
+						frame.getContentPane().removeAll();
+				    	frame.add(new quizResultPanel(frame));
+				    	frame.setVisible(true);
+					}
+				}
+			});
+			
+			nextButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					index++;
+					if(index < deck.getSize()) displayTextFieldMode();
+					else{
+						deck.addResult(correct);
+						score = new Score(deck.getSize(), correct);
+						frame.getContentPane().removeAll();
+				    	frame.add(new quizResultPanel(frame));
+				    	frame.setVisible(true);
+					}
 				}
 			});
 			
@@ -621,6 +664,13 @@ public class GUI extends JFrame {
 					score.addWrongAttempt();
 					index++;
 					if(index < deck.getSize()) displayManualMode();
+					else{
+						deck.addResult(correct);
+						score = new Score(deck.getSize(), correct);
+						frame.getContentPane().removeAll();
+				    	frame.add(new quizResultPanel(frame));
+				    	frame.setVisible(true);
+					}
 				}
 			});
 			
@@ -648,6 +698,7 @@ public class GUI extends JFrame {
 			correctButton.setVisible(false);
 			incorrectButton.setVisible(false);
 			checkAnswerButton.setVisible(true);
+			nextButton.setVisible(false);
 			
 			cardTextPanel.setText(deck.getCard(index).getQuestion());
 		}
@@ -659,6 +710,7 @@ public class GUI extends JFrame {
 			checkAnswerButton.setVisible(false);
 			correctButton.setVisible(true);
 			incorrectButton.setVisible(true);	
+			nextButton.setVisible(false);
 			cardTextPanel.setText(deck.getCard(index).getAnswer());
 		}
 		
@@ -666,12 +718,23 @@ public class GUI extends JFrame {
 		 * Helper method to change the state of the Panel to TextFieldMode mode
 		 */
 		public void displayTextFieldMode(){
-			answerLabel.setVisible(true);
+			answerLabel.setVisible(false);
 			answerTextField.setVisible(true);
 			submitButton.setVisible(true);
 			correctButton.setVisible(false);
 			incorrectButton.setVisible(false);
 			checkAnswerButton.setVisible(false);
+			nextButton.setVisible(false);
+			answerTextField.setText("");
+			cardTextPanel.setText(deck.getCard(index).getQuestion());
+		}
+		
+		public void displayCheckAnswerSumbitMode(){
+			answerTextField.setVisible(false);
+			answerLabel.setVisible(true);
+			nextButton.setVisible(true);
+			submitButton.setVisible(false);
+			cardTextPanel.setText(deck.getCard(index).getAnswer());
 		}
 	}
 	
@@ -1261,6 +1324,51 @@ public class GUI extends JFrame {
 		}
  	}
  	
- 	
+ 	public class quizResultPanel extends JPanel {
+ 		public quizResultPanel(GUI frame){
+ 			setLayout(null);
+ 			
+ 			JLabel cardLabel = new JLabel("Quiz Results");
+ 			cardLabel.setHorizontalAlignment(SwingConstants.LEFT);
+ 			cardLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+ 			cardLabel.setBounds(163, 23, 158, 29);
+ 			add(cardLabel);
+ 			
+ 			JButton backButton = new JButton("Back to Menu");
+ 			backButton.setBounds(25, 242, 132, 25);
+ 			add(backButton);
+ 			
+ 			JButton againButton = new JButton("Quiz Again");
+ 			againButton.setBounds(281, 242, 132, 25);
+ 			add(againButton);
+ 			
+ 			JLabel scoreLabel = new JLabel("Your Score:");
+ 			scoreLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+ 			scoreLabel.setBounds(124, 119, 102, 25);
+ 			add(scoreLabel);
+ 			
+ 			JLabel percentLabel = new JLabel("");
+ 			percentLabel.setText(score.getPercentage()*100 + "%");
+ 			percentLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+ 			percentLabel.setBounds(250, 121, 75, 20);
+ 			add(percentLabel);
+ 			
+ 			againButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new QuizPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+ 			
+ 			backButton.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					frame.getContentPane().removeAll();
+					frame.add(new deckMenuPanel(frame));
+					frame.setVisible(true);
+				}
+			});
+ 		}
+ 	}
 
 }
