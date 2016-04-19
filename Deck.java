@@ -26,6 +26,10 @@ public class Deck implements Serializable{
 		category = "";
 	} 
 
+	/**
+	 * 
+	 * @param name the name of the deck
+	 */
 	public Deck(String name){ 
 		this.name = name; 
 		cardList = new ArrayList<Card>(); 
@@ -34,6 +38,11 @@ public class Deck implements Serializable{
 		category = "";
 	} 
 
+	/**
+	 * 
+	 * @param name the name of the deck 
+	 * @param category the category of the deck 
+	 */
 	public Deck(String name, String category){ 
 		this.name = name; 
 		cardList = new ArrayList<Card>(); 
