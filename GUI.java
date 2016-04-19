@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -38,6 +40,8 @@ public class GUI extends JFrame {
 	private Card card;
 	private Deck originalDeck;
 	private Score score;
+	private int state; //0 = normal, 1 = freq missed normal, 2 = category, 3 = freq missed category
+	
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -144,6 +148,23 @@ public class GUI extends JFrame {
 			JButton createButton = new JButton("Create");
 			createButton.setBounds(310, 230, 112, 25);
 			add(createButton);
+			createButton.setEnabled(false);
+			
+			textField.getDocument().addDocumentListener(new DocumentListener() {
+				  public void changedUpdate(DocumentEvent e) {
+				    if(textField.getText().trim().length() > 0)createButton.setEnabled(true);
+				    else createButton.setEnabled(false);
+				  }
+				  public void removeUpdate(DocumentEvent e) {
+					  if(textField.getText().trim().length() > 0)createButton.setEnabled(true);
+					  else createButton.setEnabled(false);
+				  }
+				  public void insertUpdate(DocumentEvent e) {
+					  if(textField.getText().trim().length() > 0)createButton.setEnabled(true);
+					  else createButton.setEnabled(false);
+				  }
+				  
+			});
 			
 			backButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
@@ -185,6 +206,7 @@ public class GUI extends JFrame {
 					}
 				}
 			});
+			
 		}
 	}
 	
@@ -301,6 +323,40 @@ public class GUI extends JFrame {
 			catTextField.setColumns(10);
 			catTextField.setBounds(12, 172, 267, 27);
 			add(catTextField);
+			
+			createButton.setEnabled(false);
+			
+			catTextField.getDocument().addDocumentListener(new DocumentListener() {
+				  public void changedUpdate(DocumentEvent e) {
+				    if(catTextField.getText().trim().length() > 0 && nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+				    else createButton.setEnabled(false);
+				  }
+				  public void removeUpdate(DocumentEvent e) {
+					  if(catTextField.getText().trim().length() > 0 && nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+					  else createButton.setEnabled(false);
+				  }
+				  public void insertUpdate(DocumentEvent e) {
+					  if(catTextField.getText().trim().length() > 0 && nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+					  else createButton.setEnabled(false);
+				  }
+				  
+			});
+			
+			nameTextField.getDocument().addDocumentListener(new DocumentListener() {
+				  public void changedUpdate(DocumentEvent e) {
+				    if(catTextField.getText().trim().length() > 0 && nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+				    else createButton.setEnabled(false);
+				  }
+				  public void removeUpdate(DocumentEvent e) {
+					  if(catTextField.getText().trim().length() > 0 && nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+					  else createButton.setEnabled(false);
+				  }
+				  public void insertUpdate(DocumentEvent e) {
+					  if(catTextField.getText().trim().length() > 0 && nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+					  else createButton.setEnabled(false);
+				  }
+				  
+			});
 			
 			createButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
@@ -560,7 +616,7 @@ public class GUI extends JFrame {
 			backButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					frame.getContentPane().removeAll();
-					frame.add(new editPanel(frame));
+					frame.add(new deckMenuPanel(frame));
 					frame.setVisible(true);
 				}
 			});
@@ -578,6 +634,8 @@ public class GUI extends JFrame {
 
 		public QuizPanel(GUI frame) {
 			setLayout(null);
+			
+			deck.shuffleDeck();
 			
 			JLabel quizModeLabel = new JLabel("Quiz Mode");
 			quizModeLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -723,7 +781,9 @@ public class GUI extends JFrame {
 				    int reply = JOptionPane.showConfirmDialog(frame, message, title, JOptionPane.YES_NO_OPTION);
 				    if (reply == JOptionPane.YES_OPTION) {
 				    	frame.getContentPane().removeAll();
-				    	frame.add(new deckMenuPanel(frame));
+				    	if(state == 0) frame.add(new deckMenuPanel(frame));
+				    	else if(state == 1 || state == 3) frame.add(new frequentlyMissedPanel(frame));
+				    	else if(state == 2) frame.add(new categoryMenuPanel(frame));
 				    	frame.setVisible(true);
 				    } 
 				}
@@ -848,7 +908,7 @@ public class GUI extends JFrame {
 			nextButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					if(index != deck.getSize()-1) index++;
-					else index--;
+					else index = 0;
 					cardTextPanel.setText(deck.getCard(index).getQuestion());
 					numberLabel.setText(index+1 + " of " + deck.getSize());
 				}
@@ -866,7 +926,9 @@ public class GUI extends JFrame {
 			quitButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					frame.getContentPane().removeAll();
-					frame.add(new deckMenuPanel(frame));
+					if(state == 0) frame.add(new deckMenuPanel(frame));
+			    	else if(state == 1 || state == 3) frame.add(new frequentlyMissedPanel(frame));
+			    	else if(state == 2) frame.add(new categoryMenuPanel(frame));
 					frame.setVisible(true);
 				}
 			});
@@ -875,115 +937,58 @@ public class GUI extends JFrame {
 	}
 	
 	
-	public class editPanel extends JPanel{
-		public editPanel(GUI frame){ 
-				setLayout(null);
-				JButton editCardButton = new JButton("Edit Cards");
-				editCardButton.setBounds(138, 38, 147, 30);
-				add(editCardButton);
-				
-				JButton renameDeckButton = new JButton("Rename Deck");
-				renameDeckButton.setBounds(138, 78, 147, 30);
-				add(renameDeckButton);
-				
-				JButton catButton = new JButton("Change Category");
-				catButton.setBounds(138, 118, 147, 30);
-				add(catButton);
-				
-				JButton quizSettingButton = new JButton("Quiz Settings");
-				quizSettingButton.setBounds(138, 158, 147, 30);
-				add(quizSettingButton);
-				
-				JButton backButton = new JButton("Back");
-				backButton.setBounds(138, 198, 147, 30);
-				add(backButton);
-
-				JLabel userNameLabel = new JLabel("Edit");
-				userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-				userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
-				userNameLabel.setBounds(93, 11, 237, 25);
-				add(userNameLabel);
-				
-				editCardButton.addActionListener( new ActionListener() {
-					public void actionPerformed(ActionEvent e){
-						frame.getContentPane().removeAll();
-						frame.add(new editCardPanel(frame));
-						frame.setVisible(true);
-					}
-				});
-				
-				renameDeckButton.addActionListener( new ActionListener() {
-					public void actionPerformed(ActionEvent e){
-						frame.getContentPane().removeAll();
-						frame.add(new renameDeckPanel(frame));
-						frame.setVisible(true);
-					}
-				});
-				
-				catButton.addActionListener( new ActionListener() {
-					public void actionPerformed(ActionEvent e){
-						frame.getContentPane().removeAll();
-						frame.add(new changeCategoryPanel(frame));
-						frame.setVisible(true);
-					}
-				});
-				
-				quizSettingButton.addActionListener( new ActionListener() {
-					public void actionPerformed(ActionEvent e){
-						frame.getContentPane().removeAll();
-						frame.add(new quizSettingPanel(frame));
-						frame.setVisible(true);
-					}
-				});
-
-				backButton.addActionListener( new ActionListener() {
-					public void actionPerformed(ActionEvent e){
-						frame.getContentPane().removeAll();
-						frame.add(new deckMenuPanel(frame));
-						frame.setVisible(true);
-					}
-				});		
-		}
-	}
 	public class deckMenuPanel extends JPanel{
 		public deckMenuPanel(GUI frame){ 
-		setLayout(null);
-		JButton quizButton = new JButton("Quiz");
-		quizButton.setBounds(138, 38, 147, 30);
-		add(quizButton);
-		
-		JButton practiceButton = new JButton("Practice");
-		practiceButton.setBounds(138, 78, 147, 30);
-		add(practiceButton);
-		
-		JButton editButton = new JButton("Edit");
-		editButton.setBounds(138, 118, 147, 30);
-		add(editButton);
-		
-		JButton freqMissedButton = new JButton("Frequently Missed");
-		freqMissedButton.setBounds(138, 158, 147, 30);
-		add(freqMissedButton);
-		
-		JButton resultsButton = new JButton("Results");
-		resultsButton.setBounds(138, 198, 147, 30);
-		add(resultsButton);
-		
-		JButton backButton = new JButton("Back");
-		backButton.setBounds(138, 238, 147, 30);
-		add(backButton);
-		
-		JLabel userNameLabel = new JLabel(deck.getName());
-		userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
-		userNameLabel.setBounds(93, 11, 237, 25);
-		add(userNameLabel);
+			setLayout(null);
+			state = 0;
+			JButton quizButton = new JButton("Quiz");
+			quizButton.setBounds(72, 51, 147, 30);
+			add(quizButton);
+			
+			JButton practiceButton = new JButton("Practice");
+			practiceButton.setBounds(231, 51, 147, 30);
+			add(practiceButton);
+			
+			JButton editCardButton = new JButton("Edit Cards");
+			editCardButton.setBounds(72, 94, 147, 30);
+			add(editCardButton);
+			
+			JButton freqMissedButton = new JButton("Frequently Missed");
+			freqMissedButton.setBounds(72, 137, 147, 30);
+			add(freqMissedButton);
+			
+			JButton resultsButton = new JButton("Results");
+			resultsButton.setBounds(231, 94, 147, 30);
+			add(resultsButton);
+			
+			JButton backButton = new JButton("Back");
+			backButton.setBounds(148, 233, 147, 30);
+			add(backButton);
+			
+			JLabel userNameLabel = new JLabel(deck.getName());
+			userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+			userNameLabel.setBounds(12, 13, 426, 25);
+			add(userNameLabel);
+			
+			JButton quizSettingButton = new JButton("Quiz Settings");
+			quizSettingButton.setBounds(231, 180, 147, 30);
+			add(quizSettingButton);
+			
+			JButton catButton = new JButton("Change Category");
+			catButton.setBounds(72, 180, 147, 30);
+			add(catButton);
+			
+			JButton renameDeckButton = new JButton("Rename Deck");
+			renameDeckButton.setBounds(231, 137, 147, 30);
+			add(renameDeckButton);
 	
 		quizButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				if(deck.getSize() == 0) {
 					 Object[] options = {"OK"};
 					    int n = JOptionPane.showOptionDialog(frame,
-					                   "Oops, there are no cards in this deck. Go to Edit Cards under Edit to add cards.","No Cards",
+					                   "Oops, there are no cards in this deck. Go to Edit Cards to add some.","No Cards",
 					                   JOptionPane.PLAIN_MESSAGE,
 					                   JOptionPane.QUESTION_MESSAGE,
 					                   null,
@@ -1003,7 +1008,7 @@ public class GUI extends JFrame {
 				if(deck.getSize() == 0) {
 					 Object[] options = {"OK"};
 					    int n = JOptionPane.showOptionDialog(frame,
-					                   "Oops, there are no cards in this deck. Go to Edit Cards under Edit to add cards.","No Cards",
+					                   "Oops, there are no cards in this deck. Go to Edit Cards to add some.","No Cards",
 					                   JOptionPane.PLAIN_MESSAGE,
 					                   JOptionPane.QUESTION_MESSAGE,
 					                   null,
@@ -1018,24 +1023,17 @@ public class GUI extends JFrame {
 			}
 		});
 		
-		editButton.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e){
-				frame.getContentPane().removeAll();
-				frame.add(new editPanel(frame));
-				frame.setVisible(true);
-			}
-		});
-		
 		freqMissedButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent e){
 				originalDeck = deck;
+				state = 1;
 				deck = user.createFreqMissed(deck);
 				if(deck.getSize() == 0){
 					deck = originalDeck;
-					 Object[] options = {"OK"};
+					state = 0;
+					Object[] options = {"OK"};
 				    int n = JOptionPane.showOptionDialog(frame,
-				                   "Oops, no cards qualify as frequently missed.\n\n Go to "
-				                   + "Quiz Settings under Edit to change your frequently missed settings.","No Cards",
+				                   "Oops, no cards in this deck qualify as frequently missed.","No Cards",
 				                   JOptionPane.PLAIN_MESSAGE,
 				                   JOptionPane.QUESTION_MESSAGE,
 				                   null,
@@ -1054,6 +1052,38 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e){
 				frame.getContentPane().removeAll();
 				frame.add(new resultPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		editCardButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new editCardPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		renameDeckButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new renameDeckPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		catButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new changeCategoryPanel(frame));
+				frame.setVisible(true);
+			}
+		});
+		
+		quizSettingButton.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				frame.getContentPane().removeAll();
+				frame.add(new quizSettingPanel(frame));
 				frame.setVisible(true);
 			}
 		});
@@ -1187,6 +1217,40 @@ public class GUI extends JFrame {
  			answerLabel.setBounds(25, 153, 68, 17);
  			add(answerLabel);
  			
+ 			addButton.setEnabled(false);
+ 			
+ 			questionTextArea.getDocument().addDocumentListener(new DocumentListener() {
+				  public void changedUpdate(DocumentEvent e) {
+				    if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)addButton.setEnabled(true);
+				    else addButton.setEnabled(false);
+				  }
+				  public void removeUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)addButton.setEnabled(true);
+					  else addButton.setEnabled(false);
+				  }
+				  public void insertUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)addButton.setEnabled(true);
+					  else addButton.setEnabled(false);
+				  }
+				  
+			});
+ 			
+ 			answerTextArea.getDocument().addDocumentListener(new DocumentListener() {
+				  public void changedUpdate(DocumentEvent e) {
+				    if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)addButton.setEnabled(true);
+				    else addButton.setEnabled(false);
+				  }
+				  public void removeUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)addButton.setEnabled(true);
+					  else addButton.setEnabled(false);
+				  }
+				  public void insertUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)addButton.setEnabled(true);
+					  else addButton.setEnabled(false);
+				  }
+				  
+			});
+ 			
  			addButton.addActionListener( new ActionListener() {
  				public void actionPerformed(ActionEvent e){
  					String q = questionTextArea.getText();
@@ -1274,6 +1338,40 @@ public class GUI extends JFrame {
  			answerLabel.setBounds(25, 153, 68, 17);
  			add(answerLabel);
  			
+ 			saveButton.setEnabled(false);
+ 			
+ 			questionTextArea.getDocument().addDocumentListener(new DocumentListener() {
+				  public void changedUpdate(DocumentEvent e) {
+				    if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)saveButton.setEnabled(true);
+				    else saveButton.setEnabled(false);
+				  }
+				  public void removeUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)saveButton.setEnabled(true);
+					  else saveButton.setEnabled(false);
+				  }
+				  public void insertUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)saveButton.setEnabled(true);
+					  else saveButton.setEnabled(false);
+				  }
+				  
+			});
+ 			
+ 			answerTextArea.getDocument().addDocumentListener(new DocumentListener() {
+				  public void changedUpdate(DocumentEvent e) {
+				    if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)saveButton.setEnabled(true);
+				    else saveButton.setEnabled(false);
+				  }
+				  public void removeUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)saveButton.setEnabled(true);
+					  else saveButton.setEnabled(false);
+				  }
+				  public void insertUpdate(DocumentEvent e) {
+					  if(questionTextArea.getText().trim().length() > 0 && answerTextArea.getText().trim().length() > 0)saveButton.setEnabled(true);
+					  else saveButton.setEnabled(false);
+				  }
+				  
+			});
+ 			
  			saveButton.addActionListener( new ActionListener() {
  				public void actionPerformed(ActionEvent e){
  					String q = questionTextArea.getText();
@@ -1360,7 +1458,8 @@ public class GUI extends JFrame {
  				public void actionPerformed(ActionEvent e){
  					deck = originalDeck;
  					frame.getContentPane().removeAll();
- 					frame.add(new deckMenuPanel(frame));
+ 					if(state == 1) frame.add(new deckMenuPanel(frame));
+			    	else if(state == 3) frame.add(new categoryMenuPanel(frame));
  					frame.setVisible(true);
  				}
  			});
@@ -1370,6 +1469,7 @@ public class GUI extends JFrame {
  	public class categoryMenuPanel extends JPanel{
 		public categoryMenuPanel(GUI frame){ 
 			setLayout(null);
+			state = 2;
 			JButton quizButton = new JButton("Quiz");
 			quizButton.setBounds(138, 38, 147, 30);
 			add(quizButton);
@@ -1441,12 +1541,13 @@ public class GUI extends JFrame {
 				public void actionPerformed(ActionEvent e){
 					originalDeck = deck;
 					deck = user.createFreqMissed(deck);
+					state = 3;
 					if(deck.getSize() == 0){
 						deck = originalDeck;
+						state = 2;
 						Object[] options = {"OK"};
 					    int n = JOptionPane.showOptionDialog(frame,
-					                   "Oops, no cards qualify as frequently missed.\n\n Go to "
-					                   + "Quiz Settings to change your frequently missed settings.","No Cards",
+					                   "Oops, no cards in this deck qualify as frequently missed.","No Cards",
 					                   JOptionPane.PLAIN_MESSAGE,
 					                   JOptionPane.QUESTION_MESSAGE,
 					                   null,
@@ -1521,7 +1622,9 @@ public class GUI extends JFrame {
  			backButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					frame.getContentPane().removeAll();
-					frame.add(new deckMenuPanel(frame));
+					if(state == 0) frame.add(new deckMenuPanel(frame));
+			    	else if(state == 1 || state == 3) frame.add(new frequentlyMissedPanel(frame));
+			    	else if(state == 2) frame.add(new categoryMenuPanel(frame));
 					frame.setVisible(true);
 				}
 			});
@@ -1547,6 +1650,7 @@ public class GUI extends JFrame {
  			catTextField.setColumns(10);
  			catTextField.setBounds(12, 110, 267, 27);
  			add(catTextField);
+ 			catTextField.setText(deck.getCategory());
  	
  			JButton backButton = new JButton("Back");
  			backButton.setBounds(12, 230, 112, 25);
@@ -1555,6 +1659,23 @@ public class GUI extends JFrame {
  			JButton createButton = new JButton("Update");
  			createButton.setBounds(310, 230, 112, 25);
  			add(createButton);
+ 			
+ 			createButton.setEnabled(false);
+				catTextField.getDocument().addDocumentListener(new DocumentListener() {
+					  public void changedUpdate(DocumentEvent e) {
+					    if(catTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+					    else createButton.setEnabled(false);
+					  }
+					  public void removeUpdate(DocumentEvent e) {
+						  if(catTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+						  else createButton.setEnabled(false);
+					  }
+					  public void insertUpdate(DocumentEvent e) {
+						  if(catTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+						  else createButton.setEnabled(false);
+					  }
+					  
+				});
 
  			createButton.addActionListener( new ActionListener() {
  				public void actionPerformed(ActionEvent e){
@@ -1572,7 +1693,7 @@ public class GUI extends JFrame {
  					else {
  						deck.setCategory(cat);
  						frame.getContentPane().removeAll();
- 						frame.add(new editPanel(frame));
+ 						frame.add(new deckMenuPanel(frame));
  						frame.setVisible(true);
  					}
  				}
@@ -1581,7 +1702,7 @@ public class GUI extends JFrame {
  			backButton.addActionListener( new ActionListener() {
  				public void actionPerformed(ActionEvent e){
  					frame.getContentPane().removeAll();
- 					frame.add(new editPanel(frame));
+ 					frame.add(new deckMenuPanel(frame));
  					frame.setVisible(true);
  				}
  			});
@@ -1607,6 +1728,7 @@ public class GUI extends JFrame {
  				nameTextField.setBounds(12, 102, 267, 27);
  				add(nameTextField);
  				nameTextField.setColumns(10);
+ 				nameTextField.setText(deck.getName());
 
  				JButton backButton = new JButton("Back");
  				backButton.setBounds(12, 230, 112, 25);
@@ -1615,6 +1737,23 @@ public class GUI extends JFrame {
  				JButton createButton = new JButton("Update");
  				createButton.setBounds(310, 230, 112, 25);
  				add(createButton);
+ 				
+ 				createButton.setEnabled(false);
+ 				nameTextField.getDocument().addDocumentListener(new DocumentListener() {
+ 					  public void changedUpdate(DocumentEvent e) {
+ 					    if(nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+ 					    else createButton.setEnabled(false);
+ 					  }
+ 					  public void removeUpdate(DocumentEvent e) {
+ 						  if(nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+ 						  else createButton.setEnabled(false);
+ 					  }
+ 					  public void insertUpdate(DocumentEvent e) {
+ 						  if(nameTextField.getText().trim().length() > 0)createButton.setEnabled(true);
+ 						  else createButton.setEnabled(false);
+ 					  }
+ 					  
+ 				});
  				
  				createButton.addActionListener( new ActionListener() {
  					public void actionPerformed(ActionEvent e){
@@ -1644,7 +1783,7 @@ public class GUI extends JFrame {
  						else {	
  							deck.setName(name);
  							frame.getContentPane().removeAll();
- 							frame.add(new editPanel(frame));
+ 							frame.add(new deckMenuPanel(frame));
  							frame.setVisible(true);
  						}
  					}
@@ -1653,7 +1792,7 @@ public class GUI extends JFrame {
  				backButton.addActionListener( new ActionListener() {
  					public void actionPerformed(ActionEvent e){
  						frame.getContentPane().removeAll();
- 						frame.add(new editPanel(frame));
+ 						frame.add(new deckMenuPanel(frame));
  						frame.setVisible(true);
  					}
  				});
@@ -1668,15 +1807,7 @@ public class GUI extends JFrame {
  			JButton backButton = new JButton("Back");
  			backButton.setBounds(163, 241, 117, 29);
  			add(backButton);
- 			/*
- 			JButton button = new JButton("<-");
- 			button.setBounds(39, 241, 117, 29);
- 			add(button);
- 			
- 			JButton button_1 = new JButton("->");
- 			button_1.setBounds(297, 241, 117, 29);
- 			add(button_1);
- 			*/
+ 		
  			JLabel resultsLabel = new JLabel("Results");
  			resultsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
  			resultsLabel.setBounds(190, 19, 61, 16);
@@ -1696,6 +1827,7 @@ public class GUI extends JFrame {
 
  			table = new JTable(data, columnNames);
  			table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			table.setEnabled(false);
  			
  			JScrollPane scrollPane = new JScrollPane(table);
  			scrollPane.setBounds(40, 40, 350, 190);
@@ -1718,21 +1850,22 @@ public class GUI extends JFrame {
  			setLayout(null);
  			
  			JButton backButton = new JButton("Back");
- 			backButton.setBounds(163, 241, 117, 29);
- 			add(backButton);
- 			
- 			JButton prevButton = new JButton("Previous");
- 			prevButton.setBounds(39, 241, 117, 29);
- 			add(prevButton);
- 			
- 			JButton nextButton = new JButton("Next");
- 			nextButton.setBounds(297, 241, 117, 29);
- 			add(nextButton);
- 			
- 			JLabel resultsLabel = new JLabel("Results");
- 			resultsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
- 			resultsLabel.setBounds(190, 19, 61, 16);
- 			add(resultsLabel);
+			backButton.setBounds(160, 241, 108, 29);
+			add(backButton);
+			
+			JButton prevButton = new JButton("Previous");
+			prevButton.setBounds(39, 241, 108, 29);
+			add(prevButton);
+			
+			JButton nextButton = new JButton("Next");
+			nextButton.setBounds(281, 241, 108, 29);
+			add(nextButton);
+			
+			JLabel resultsLabel = new JLabel("Results - ");
+			resultsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+			resultsLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+			resultsLabel.setBounds(12, 19, 426, 16);
+			add(resultsLabel);
  		
  			if(user.getNumberOfDecks() == 1){
  				prevButton.setEnabled(false);
@@ -1755,10 +1888,13 @@ public class GUI extends JFrame {
 
  			table = new JTable(data, columnNames);
  			table.setFont(new Font("Tahoma", Font.PLAIN, 14));
+ 			table.setEnabled(false);
  			
  			JScrollPane scrollPane = new JScrollPane(table);
  			scrollPane.setBounds(40, 40, 350, 190);
  			add(scrollPane);
+ 			
+ 			resultsLabel.setText("Results - " + deck.getName());
  			
  			backButton.addActionListener( new ActionListener() {
 					public void actionPerformed(ActionEvent e){
@@ -1791,6 +1927,8 @@ public class GUI extends JFrame {
 		 			JScrollPane scrollPane = new JScrollPane(table);
 		 			scrollPane.setBounds(40, 40, 350, 190);
 		 			add(scrollPane);
+		 			
+		 			resultsLabel.setText("Results - " + deck.getName());
 				}
  			});
  			
@@ -1817,6 +1955,8 @@ public class GUI extends JFrame {
 		 			JScrollPane scrollPane = new JScrollPane(table);
 		 			scrollPane.setBounds(40, 40, 350, 190);
 		 			add(scrollPane);
+		 			
+		 			resultsLabel.setText("Results - " + deck.getName());
 				}
  			});
  		}
@@ -1847,14 +1987,18 @@ public class GUI extends JFrame {
  			rdbtnManual.setBounds(139, 116, 109, 23);
  			add(rdbtnManual);
  			
+ 			saveButton.setEnabled(false);
+ 			
  			if(deck.getIsManual()){
  				rdbtnManual.setSelected(true);
  			}
- 			else
+ 			else{
  				rdbtnTextField.setSelected(true);
+ 			}
 
  			rdbtnTextField.addActionListener( new ActionListener() {
  				public void actionPerformed(ActionEvent e){
+ 					if(rdbtnManual.isSelected()) saveButton.setEnabled(true);
  					rdbtnManual.setSelected(false);	
  					rdbtnTextField.setSelected(true);
  			}
@@ -1862,6 +2006,7 @@ public class GUI extends JFrame {
  			
  			rdbtnManual.addActionListener( new ActionListener() {
  				public void actionPerformed(ActionEvent e){
+ 					if(rdbtnTextField.isSelected()) saveButton.setEnabled(true);
  					rdbtnTextField.setSelected(false);
  					rdbtnManual.setSelected(true);
  			}	
@@ -1871,16 +2016,26 @@ public class GUI extends JFrame {
  				public void actionPerformed(ActionEvent e){
  					if(rdbtnTextField.isSelected()){
  						deck.setManualOff();
+ 						frame.getContentPane().removeAll();
+ 						if(state == 0) frame.add(new deckMenuPanel(frame));
+ 						else if(state == 2) frame.add(new categoryMenuPanel(frame));
+ 						frame.setVisible(true);
  					}
- 					else
+ 					else{
  						deck.setManualOn();
+ 						frame.getContentPane().removeAll();
+ 						if(state == 0) frame.add(new deckMenuPanel(frame));
+ 						else if(state == 2) frame.add(new categoryMenuPanel(frame));
+ 						frame.setVisible(true);
+ 					}
  			}	
  			});	
  				
  				backButton.addActionListener( new ActionListener() {
  					public void actionPerformed(ActionEvent e){
  						frame.getContentPane().removeAll();
- 						frame.add(new editPanel(frame));
+ 						if(state == 0) frame.add(new deckMenuPanel(frame));
+ 						else if(state == 2) frame.add(new categoryMenuPanel(frame));
  						frame.setVisible(true);
  					}
  				});
