@@ -74,6 +74,10 @@ public class GUI extends JFrame {
 		
 	}
 
+	/**
+	 * 
+	 * @param pm the profilemanager object used in main method
+	 */
 	public GUI(ProfileManager pm) {
 		setTitle("Study Tool");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,7 +88,15 @@ public class GUI extends JFrame {
 
 	}
 	
+	/**
+	 * Class that creates the welcome/opening panel for the GUI
+	 */
 	public class openPanel extends JPanel{
+		
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public openPanel(GUI frame){
 			setLayout(null);
 			
@@ -122,6 +134,10 @@ public class GUI extends JFrame {
 	}
 	
 	public class userPanel extends JPanel{
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public userPanel(GUI frame){
 			setLayout(null);
 			
@@ -211,6 +227,10 @@ public class GUI extends JFrame {
 	}
 	
 	public class userListPanel extends JPanel{
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public userListPanel(GUI frame){
 			setLayout(null);
 			
@@ -286,6 +306,10 @@ public class GUI extends JFrame {
 	}
 	
 	public class newDeckPanel extends JPanel{
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public newDeckPanel(GUI frame){
 			setLayout(null);
 			
@@ -414,6 +438,10 @@ public class GUI extends JFrame {
 	}
 	
 	public class deckListPanel extends JPanel{
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public deckListPanel(GUI frame){
 			setLayout(null);
 			
@@ -489,6 +517,10 @@ public class GUI extends JFrame {
 	}
 	
 	public class categoryPanel extends JPanel{
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public categoryPanel(GUI frame){
 			setLayout(null);
 			
@@ -537,6 +569,10 @@ public class GUI extends JFrame {
 	}
 	
 	public class editCardPanel extends JPanel{
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public editCardPanel(GUI frame){
 			setLayout(null);
 			
@@ -632,6 +668,10 @@ public class GUI extends JFrame {
 		private int index;
 		private int correct;
 
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public QuizPanel(GUI frame) {
 			setLayout(null);
 			
@@ -845,6 +885,10 @@ public class GUI extends JFrame {
 	
 	public class PracticePanel extends JPanel {
 		private int index;
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public PracticePanel(GUI frame) {
 			setLayout(null);
 			
@@ -938,6 +982,11 @@ public class GUI extends JFrame {
 	
 	
 	public class deckMenuPanel extends JPanel{
+		
+		/**
+		 * 
+		 * @param frame the instance of the GUI object being used
+		 */
 		public deckMenuPanel(GUI frame){ 
 			setLayout(null);
 			state = 0;
@@ -1099,6 +1148,11 @@ public class GUI extends JFrame {
 	}
 		
  	public class userMenuPanel extends JPanel{
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
 		public userMenuPanel(GUI frame){ 
 		setLayout(null);
 		
@@ -1176,6 +1230,11 @@ public class GUI extends JFrame {
 	}
  	
  	public class addCardPanel extends JPanel{
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public addCardPanel(GUI frame){
  			setLayout(null);
  			
@@ -1295,6 +1354,11 @@ public class GUI extends JFrame {
  	}
  	
  	public class editOneCardPanel extends JPanel{
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public editOneCardPanel(GUI frame){
  			setLayout(null);
  			
@@ -1417,6 +1481,11 @@ public class GUI extends JFrame {
  	}
  	
  	public class frequentlyMissedPanel extends JPanel{
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public frequentlyMissedPanel(GUI frame){
  			setLayout(null);
  			
@@ -1467,6 +1536,11 @@ public class GUI extends JFrame {
  	}
  	
  	public class categoryMenuPanel extends JPanel{
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
 		public categoryMenuPanel(GUI frame){ 
 			setLayout(null);
 			state = 2;
@@ -1581,6 +1655,11 @@ public class GUI extends JFrame {
  	}
  	
  	public class quizResultPanel extends JPanel {
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public quizResultPanel(GUI frame){
  			setLayout(null);
  			
@@ -1632,6 +1711,11 @@ public class GUI extends JFrame {
  	}
  	
  	public class changeCategoryPanel extends JPanel{
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public changeCategoryPanel(GUI frame){ 
  			setLayout(null);
 
@@ -1710,6 +1794,11 @@ public class GUI extends JFrame {
  	}
  	
  	public class renameDeckPanel extends JPanel{
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public renameDeckPanel(GUI frame){ 
  				setLayout(null);
  				
@@ -1801,6 +1890,11 @@ public class GUI extends JFrame {
  	
  	public class resultPanel extends JPanel {
  		private JTable table;
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public resultPanel(GUI frame) {
  			setLayout(null);
  			
@@ -1846,6 +1940,11 @@ public class GUI extends JFrame {
  	public class userResultPanel extends JPanel {
  		private JTable table;
  		private int index;
+ 		
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public userResultPanel(GUI frame) {
  			setLayout(null);
  			
@@ -1963,6 +2062,10 @@ public class GUI extends JFrame {
  	}
  	
  	public class quizSettingPanel extends JPanel{
+ 		/**
+ 		 * 
+ 		 * @param frame the instance of the GUI object being used
+ 		 */
  		public quizSettingPanel(GUI frame){ 
  		setLayout(null);
  			
