@@ -749,7 +749,7 @@ public class GUI extends JFrame {
 			
 			submitButton.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e){
-					if(answerTextField.getText().toLowerCase().equals(deck.getCard(index).getAnswer().toLowerCase())){
+					if(answerTextField.getText().toLowerCase().trim().equals(deck.getCard(index).getAnswer().toLowerCase())){//where i added trim
 						score = deck.getCard(index).getScoreObject();
 						score.addCorrectAttempt();
 						correct++;
