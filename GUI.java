@@ -1916,7 +1916,7 @@ public class GUI extends JFrame {
  			Object[][] data = new Object[scoring.size()][2];
  			for (int i = 0; i < scoring.size(); i++) {
  			    data[i][0] = i+1;
- 			    data[i][1] = f.format(scoring.get(i).getPercentage()*100)+"%";
+ 			    data[i][1] = String.format("%.2f",scoring.get(i).getPercentage()*100) + "%";
  			}
 
  			table = new JTable(data, columnNames);
@@ -1982,7 +1982,8 @@ public class GUI extends JFrame {
  			Object[][] data = new Object[scoring.size()][2];
  			for (int i = 0; i < scoring.size(); i++) {
  			    data[i][0] = i+1;
- 			    data[i][1] = f.format(scoring.get(i).getPercentage()*100)+"%";
+ 			    data[i][1] = String.format("%.2f",scoring.get(i).getPercentage()*100) + "%";
+
  			}
 
  			table = new JTable(data, columnNames);
