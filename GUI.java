@@ -1179,6 +1179,7 @@ public class GUI extends JFrame {
 		if(user.getNumberOfDecks() == 0){
 			viewDeckButton.setEnabled(false);
 			viewCategoriesButton.setEnabled(false);
+			resultsButton.setEnabled(false);
 		}
 		
 		JLabel userNameLabel = new JLabel(user.getUsername());
